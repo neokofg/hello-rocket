@@ -8,7 +8,7 @@ use crate::schema::posts::{body, published, title};
 
 #[get("/")]
 pub fn index_handler() -> Json<Vec<Post>> {
-    let connection = &mut crate::lib::establish_connection();
+    let connection = &mut crate::database::establish_connection();
     let results = posts_table
         .filter(published.eq(true))
         .limit(5)
@@ -20,7 +20,7 @@ pub fn index_handler() -> Json<Vec<Post>> {
 }
 #[post("/", data = "<post>")]
 pub fn post_handler(post: Json<NewPost<'_>>) -> Json<Post> {
-    let connection = &mut crate::lib::establish_connection();
+    let connection = &mut crate::database::establish_connection();
 
     Json(diesel::insert_into(posts::table)
         .values(&post.into_inner())
@@ -30,7 +30,7 @@ pub fn post_handler(post: Json<NewPost<'_>>) -> Json<Post> {
 }
 #[put("/<post_id>", data = "<post>")]
 pub fn put_handler(post_id: i32, post: Json<PutPost<'_>>) -> Json<Post> {
-    let connection = &mut crate::lib::establish_connection();
+    let connection = &mut crate::database::establish_connection();
     let post = post.into_inner();
     Json(diesel::update(posts_table.find(post_id))
         .set((published.eq(post.published), title.eq(post.title), body.eq(post.body)))
@@ -40,7 +40,7 @@ pub fn put_handler(post_id: i32, post: Json<PutPost<'_>>) -> Json<Post> {
 }
 #[delete("/<post_id>")]
 pub fn delete_handler(post_id: i32) -> Json<&'static str> {
-    let connection = &mut crate::lib::establish_connection();
+    let connection = &mut crate::database::establish_connection();
     diesel::delete(posts_table.find(post_id))
         .execute(connection)
         .expect("Error deleting post");

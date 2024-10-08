@@ -1,14 +1,35 @@
 #[macro_use] extern crate rocket;
+
+use std::collections::HashMap;
+use tokio::sync::RwLock;
+use crate::models::chat::ChatServer;
+
 pub mod app;
-pub mod lib;
+pub mod database;
 pub mod models;
 pub mod schema;
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
 
-#[launch]
-fn rocket() -> _ {
-    rocket::build()
-        .mount("/", routes![app::handlers::post_handlers::index_handler])
-        .mount("/", routes![app::handlers::post_handlers::post_handler])
-        .mount("/", routes![app::handlers::post_handlers::put_handler])
-        .mount("/", routes![app::handlers::post_handlers::delete_handler])
+    let _rocket = rocket::build()
+        .manage(ChatServer {
+            rooms: RwLock::new(HashMap::new())
+        })
+        .mount("/", routes![
+            app::handlers::post_handlers::index_handler,
+            app::handlers::post_handlers::post_handler,
+            app::handlers::post_handlers::put_handler,
+            app::handlers::post_handlers::delete_handler
+        ])
+        .mount("/chat", routes![
+            app::handlers::chat_handlers::index_handler,
+            app::handlers::chat_handlers::post_handler,
+            app::handlers::message_handlers::post_handler,
+            app::handlers::message_handlers::index_handler,
+            app::handlers::message_handlers::echo_handler
+        ])
+        .launch()
+        .await?;
+
+    Ok(())
 }
