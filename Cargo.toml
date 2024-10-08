@@ -1,0 +1,10 @@
+[package]
+name = "hello-rocket"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rocket = { version = "0.5.1", features = ["json"] }
+diesel = {version = "2.2.4", features = ["postgres"]}
+dotenvy = "0.15.7"
+serde = { version = "1.0.210", features = ["derive"] }
