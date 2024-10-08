@@ -1,6 +1,6 @@
 use diesel::prelude::*;
 use rocket::serde::json::Json;
-use crate::models::Post;
+use crate::models::post::Post;
 use crate::app::requests::post_requests::{NewPost, PutPost};
 use crate::schema::posts;
 use crate::schema::posts::dsl::posts as posts_table;
